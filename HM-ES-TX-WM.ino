@@ -17,14 +17,14 @@
 #include <SoftwareSerial.h>
 
 #define LED_PIN             4
-#define CONFIG_BUTTON_PIN   5
+#define CONFIG_BUTTON_PIN   8 //5
 
-#define IR_RX_PIN           7
-#define IR_TX_PIN           6
+#define IR_RX_PIN           6 //7
+#define IR_TX_PIN           5
 
 // SML communication
 #define SERIAL_READ_TIMEOUT_MS  100
-#define SML_MSG_BUFFER_SIZE     500
+#define SML_MSG_BUFFER_SIZE     700
 
 #define SML_TYPE_STRING             0
 #define SML_TYPE_BOOLEAN            4
@@ -60,6 +60,7 @@ const struct DeviceInfo PROGMEM devinfo = {
 // SML communication
 const uint8_t SEQUENCE_METER_READING[] = { 0x77, 0x07, 0x01, 0x00, 0x01, 0x08, 0x00, 0xFF };
 const uint8_t SEQUENCE_POWER_READING[] = { 0x77, 0x07, 0x01, 0x00, 0x10, 0x07, 0x00, 0xFF };
+//const uint8_t SEQUENCE_POWER_READING[] = { 0x77, 0x07, 0x01, 0x00, 0x24, 0x07, 0x00, 0xFF };
 
 SoftwareSerial smlSerial(IR_RX_PIN, IR_TX_PIN);
 
@@ -356,6 +357,7 @@ int64_t parseMeterReading() {
 
     for (uint16_t i = 0; i < smlBufferSize; i++) {
         for (uint8_t j = 0; j < sizeof(SEQUENCE_METER_READING); j++) {
+            //DHEX(smlBuffer[i + j]);DPRINT(" vs ");DHEXLN(SEQUENCE_METER_READING[j]);
             if (smlBuffer[i + j] != SEQUENCE_METER_READING[j]) {
                 goto meter_next;
             }
@@ -389,9 +391,9 @@ int64_t parseMeterReading() {
             return -2;
         }
 
-        if (type != SML_TYPE_SIGNED_INTEGER) {
+        if (type != SML_TYPE_UNSIGNED_INTEGER) {
             DPRINT(F("[parseMeterReading] SML_ERROR: entry = 5, type = "));
-            DHEXLN(status);
+            DHEXLN(type);
             return -3;
         }
 
@@ -461,20 +463,30 @@ int32_t parsePowerReading() {
 
         if (type != SML_TYPE_SIGNED_INTEGER) {
             DPRINT(F("[parsePowerReading] SML_ERROR: entry = 5, type = "));
-            DHEXLN(status);
+            DHEXLN(type);
             return -3;
         }
 
-        if (length != 4) {
+        if (length != 8) {
             DPRINT(F("[parsePowerReading] SML_ERROR: entry = 5, length = "));
             DHEXLN(length);
             return -4;
         }
 
+        /*
         reading =   ((int32_t) smlBuffer[start + 3])
                   | ((int32_t) smlBuffer[start + 2] << 0x08)
                   | ((int32_t) smlBuffer[start + 1] << 0x10)
                   | ((int32_t) smlBuffer[start]     << 0x18);
+        */
+        reading =   ((int64_t) smlBuffer[start + 7])
+          | ((int64_t) smlBuffer[start + 6] << 0x08)
+          | ((int64_t) smlBuffer[start + 5] << 0x10)
+          | ((int64_t) smlBuffer[start + 4] << 0x18)
+          | ((int64_t) smlBuffer[start + 3] << 0x20)
+          | ((int64_t) smlBuffer[start + 2] << 0x28)
+          | ((int64_t) smlBuffer[start + 1] << 0x30)
+          | ((int64_t) smlBuffer[start]     << 0x38);          
 
         return reading * pow(10, scaler);
 
@@ -524,7 +536,7 @@ void loop() {
         if (!available) {
             return;
         }
-
+        //DPRINTLN("smlSerial.available");
         smlBufferSize = 0;
         memset(smlBuffer, 0, sizeof(smlBuffer));
 
@@ -549,13 +561,22 @@ void loop() {
         } else {
             smlSerial.stopListening();
 
+/*
+DPRINT("sml buff size: ");DDECLN(smlBufferSize);
+for (uint16_t g=0;g<smlBufferSize;g++) {
+  DHEX(smlBuffer[g]);
+};
+DPRINTLN(".");
+*/
+
             if (isValidSMLHeader()) {
+                //DPRINTLN("SML Header valid");
                 int64_t counter = parseMeterReading();
                 if (counter >= 0) {
                     sdev.channel(1).setCounter(counter * 10);
                 }
 
-                int32_t power = parsePowerReading();
+                int64_t power = parsePowerReading();
                 if (power >= 0) {
                     sdev.channel(1).setPower(power * 100);
                 }
