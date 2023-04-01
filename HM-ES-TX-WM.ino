@@ -1,4 +1,6 @@
 /*
+ * 
+ * Copyright (c) 2023 HMSteve
  * Copyright (c) 2022 Hendrik Hagendorn
  * Copyright (c) 2016 pa-pa
  *
@@ -13,6 +15,7 @@
 
 #include <AskSinPP.h>
 #include <MultiChannelDevice.h>
+#include "RadioSleep.h"
 
 #include <SoftwareSerial.h>
 #include <FastCRC.h>
@@ -40,7 +43,7 @@
 #define SML_ERROR_OUT_OF_BOUNDS     4
 
 // we send the counter every 2 minutes
-#define MSG_CYCLE seconds2ticks(2*60)
+#define MSG_CYCLE seconds2ticks(30)
 
 // number of available peers per channel
 #define PEERS_PER_CHANNEL 2
@@ -71,6 +74,8 @@ FastCRC16 CRC16;
 uint16_t smlBufferSize = 0;
 uint8_t smlBuffer[SML_MSG_BUFFER_SIZE];
 
+
+
 /**
  * Configure the used hardware
  */
@@ -78,6 +83,7 @@ typedef AvrSPI<10, 11, 12, 13> SPIType;
 typedef Radio<SPIType, 2> RadioType;
 typedef StatusLed<LED_PIN> LedType;
 typedef AskSin<LedType, BatterySensor, RadioType> HalType;
+
 
 class MeterList0Data : public List0Data {
     uint8_t LocalResetDisable       : 1;   // 0x18 - 24
@@ -149,7 +155,7 @@ class MeterList0 : public ChannelList<MeterList0Data> {
     bool elsterCompatibilityMode() const { return isBitSet(sizeof(List0Data) + 6, 0x02); }
     bool elsterCompatibilityMode(bool value) const { return setBit(sizeof(List0Data) + 6, 0x02, value); }
 
-    uint8_t transmitDevTryMax() const { return 6; }
+    uint8_t transmitDevTryMax() const { return 2; }
     uint8_t ledMode() const { return 1; }
 
     void defaults() {
@@ -252,11 +258,12 @@ class IECEventCycleMsg : public IECEventMsg {
 
 class MeterChannel : public Channel<HalType, MeterList1, EmptyList, List4, PEERS_PER_CHANNEL, MeterList0>, public Alarm {
 
-    uint64_t counter;
-    uint32_t power;
-    Message  msg;
-    uint8_t  msgcnt;
-    bool     boot;
+    uint64_t   counter;
+    uint32_t   power;
+    Message    msg;
+    uint8_t    msgcnt;
+    bool       boot;
+    RadioSleep radiosleep;
 
   private:
 
@@ -292,12 +299,14 @@ class MeterChannel : public Channel<HalType, MeterList1, EmptyList, List4, PEERS
     }
 
     virtual void trigger(AlarmClock& clock) {
+        radiosleep.stopDelay();
         tick = MSG_CYCLE;
         clock.add(*this);
 
         ((IECEventCycleMsg&) msg).init(msgcnt++, number(), counter, power, device().battery().low());
 
         device().sendPeerEvent(msg, *this);
+        radiosleep.setDelay(2); //radio stay awake for 2s to recieve config data, if any are waiting
         boot = false;
     }
 };
@@ -572,13 +581,14 @@ meter_next:;
     return -1;
 }
 
-
 typedef MultiChannelDevice<HalType, MeterChannel, 2, MeterList0> MeterType;
 
 HalType hal;
 MeterType sdev(devinfo, 0x20);
-
 ConfigButton<MeterType> cfgBtn(sdev);
+
+
+
 
 void setup() {
     DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
@@ -590,7 +600,7 @@ void setup() {
     // add channels to timer to send event
     sysclock.add(sdev.channel(1));
     sysclock.add(sdev.channel(2));
-
+    
     sdev.initDone();
 
     // SML communication
@@ -607,6 +617,12 @@ void loop() {
     bool poll = sdev.pollRadio();
 
     if (asp_run == false && poll == false) {
+        if(radiosleepflag) {
+          DPRINTLN("radio going to bed");
+          hal.radio.setIdle();
+          radiosleepflag = false;
+        }
+        
         smlSerial.overflow();
         smlSerial.listen();
 
