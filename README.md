@@ -8,7 +8,7 @@ Eine angepasste Version des SML-Energiezaehlers basierend auf [diesem Projekt](h
 
 Es erfolgten Anpassungen an der SML-Auswertung, um die von der urspruenglichen Implementierung abweichenden SML-Nachrichten des [Lepus-Zaehlers](https://www.apator.com/de/produkte/strom/strommessung/moderne-messeinrichtung/lepus) verarbeiten zu koennen.
 
-Zudem wurde in Kanal 2 der Energie-Datenpunkt mit der eingespeisten Energie belegt. Der Leistungsdatenpunkt dieses Kanals wird nicht genutzt, da der Zaehler nur die Absolutleistung ausgibt, die in Kanal 1 angezeigt wird.Es werden also drei OBIS-Kennziffern ausgewertet:  
+Zudem wurde in Kanal 2 der Energie-Datenpunkt mit der eingespeisten Energie belegt. Der Leistungsdatenpunkt dieses Kanals wird nicht genutzt, da der Zaehler nur die Absolutleistung ausgibt, die in Kanal 1 angezeigt wird. Es werden also drei OBIS-Kennziffern ausgewertet:  
 * 1-0:1.8.0: Wirkenergie Bezug gesamt 
 * 1-0:2.8.0: Wirkenergie Einspeisung gesamt 
 * 1-0:1.7.0: momentane Gesamtwirkleistung (Absolutwert ohne Vorzeichen)
@@ -21,10 +21,10 @@ Letztlich wird das Funkmodul nach jedem Senden in den Idle-Modus versetzt, um de
 
 ## Voraussetzungen und Einschraenkungen
 
--  Zaehler muss freigeschaltet sein (ggf. Pin ueber das jeweilige EVU beziehen)
+-  Zaehler muss freigeschaltet sein (ggf. PIN ueber das jeweilige EVU beziehen)
 -  Geraeteeinstellungen der CCU werden ignoriert
 -  Geraet ist fuer Netzbetrieb ausgelegt
--  A.G. der implementierten inhaltlichen Pruefungen bspw. bzgl. SML-Nachrichtenlaenge, Datenfeldlaenge und Vorzeichenbehaftung sind fuer andere Zaehler ggf. Anpassungen am Code notwendig
+-  A.G. der implementierten inhaltlichen Pruefungen bspw. bzgl. Datenfeldlaenge und Vorzeichenbehaftung oder noch groesserer SML-Nachrichtenlaenge sind fuer andere Zaehler ggf. Anpassungen am Code notwendig
 
 
 
@@ -37,6 +37,16 @@ Der Prototyp v1.0 der Platine enthaelt leider einen Fehler, der jedoch fuer das 
 
 ![](https://github.com/HMSteve/PCBs/blob/master/AskSinPP_DinRailBoard/images/HM-ES-TX-WM_1.jpg)
 ![](https://github.com/HMSteve/PCBs/blob/master/AskSinPP_DinRailBoard/images/HM-ES-TX-WM_2.jpg)
+
+
+## Software
+Der Sketch wird ohne weitere Besonderheiten bspw. in der Arduino-IDE kompiliert. Es sind neben der AskSinPP die ueber den Bibliotheksmanager einbindbaren Bibliotheken
+* SoftSerial
+* FastCRC
+
+
+erforderlich sowie die dem Projekt beiliegende RadioSleep.h.
+
 
 ## Nuetzliche Links
 
