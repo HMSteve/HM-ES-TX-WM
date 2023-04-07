@@ -31,11 +31,18 @@ Letztlich wird das Funkmodul nach jedem Senden in den Idle-Modus versetzt, um de
 ## Hardware
 Es wird zunaechst ein Lesekopf mit seriellem Ausgang benoetigt, bspw. [Hichi IR v1.1](https://www.photovoltaikforum.com/thread/141332-neue-lesekopf-baus%C3%A4tze-ohne-smd-l%C3%B6ten/).
 
-Fuer den eigentlichen Zaehler wurde eine Platine fuer das [Camdenboss-Hutschienengehaeuse mit 2 TE](https://www.reichelt.de/leergehaeuse-58-x-36-x-90-mm-2-te-cb-hutkit-2-p133936.html) entworfen, das als praktisches Kit aus Gehaesue, vorgestanzten Klemmenabdeckungen, Bodenplatte und Deckel erhaeltlich ist.
+Fuer den eigentlichen Zaehler wurde eine [Platine](https://github.com/HMSteve/PCBs/tree/master/AskSinPP_DinRailBoard) fuer das [Camdenboss-Hutschienengehaeuse mit 2 TE](https://www.reichelt.de/leergehaeuse-58-x-36-x-90-mm-2-te-cb-hutkit-2-p133936.html) entworfen, das als praktisches Kit aus Gehaeuse, vorgestanzten Klemmenabdeckungen, Bodenplatte und Deckel erhaeltlich ist.
 
+Der Prototyp v1.0 der Platine enthaelt leider einen Fehler, der jedoch fuer das vorliegende Projekt sehr leicht durch Auftrennen einer Leiterbahn vor Bestuecken der Klemmenleiste sowie Einloeten einer Drahtbruecke behoben werden kann, siehe Bilder.
 
+![](https://github.com/HMSteve/PCBs/blob/master/AskSinPP_DinRailBoard/images/HM-ES-TX-WM_1.jpg)
+![](https://github.com/HMSteve/PCBs/blob/master/AskSinPP_DinRailBoard/images/HM-ES-TX-WM_2.jpg)
 
-## SML Specification
+## Nuetzliche Links
+
+[Infos zum SML-Protokoll](http://www.stefan-weigert.de/php_loader/sml.php)
+
+[Onlinerechner fuer verschiedene CRC-Verfahren](https://crccalc.com/)
 
 [www.bsi.bund.de](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03109/TR-03109-1_Anlage_Feinspezifikation_Drahtgebundene_LMN-Schnittstelle_Teilb.pdf?__blob=publicationFile)
 
