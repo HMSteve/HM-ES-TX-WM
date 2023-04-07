@@ -31,7 +31,7 @@ Letztlich wird das Funkmodul nach jedem Senden in den Idle-Modus versetzt, um de
 ## Hardware
 Es wird zunaechst ein Lesekopf mit seriellem Ausgang benoetigt, bspw. [Hichi IR v1.1](https://www.photovoltaikforum.com/thread/141332-neue-lesekopf-baus%C3%A4tze-ohne-smd-l%C3%B6ten/).
 
-Fuer den eigentlichen Zaehler wurde eine Platine fuer das [Camdenboss-Hutschienengehaeuse mit 2 TE](https://www.reichelt.de/leergehaeuse-58-x-36-x-90-mm-2-te-cb-hutkit-2-p133936.html) entworfen, das als praktisches Kit aus Gehaesue, vorgestanzten Klemmenabdeckungen, Bodenplatte und Deckel erhaeltlich ist.
+Fuer den eigentlichen Zaehler wurde eine Platine fuer das [Camdenboss-Hutschienengehaeuse mit 2 TE]() entworfen.
 
 
 

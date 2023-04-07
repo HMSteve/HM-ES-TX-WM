@@ -20,10 +20,10 @@
 #include <SoftwareSerial.h>
 #include <FastCRC.h>
 
-#define LED_PIN             4
-#define CONFIG_BUTTON_PIN   8 //5
+#define LED_PIN             7 //4
+#define CONFIG_BUTTON_PIN   6 //8 
 
-#define IR_RX_PIN           6 //7
+#define IR_RX_PIN           4 //6 
 #define IR_TX_PIN           5
 
 // SML communication
@@ -43,7 +43,7 @@
 #define SML_ERROR_OUT_OF_BOUNDS     4
 
 // we send the counter every 2 minutes
-#define MSG_CYCLE seconds2ticks(30)
+#define MSG_CYCLE seconds2ticks(123)
 
 // number of available peers per channel
 #define PEERS_PER_CHANNEL 2
